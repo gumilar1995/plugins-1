@@ -20,7 +20,11 @@ flutter:
 dependencies:
   flutter:
     sdk: flutter
-  video_player_platform_interface: ^5.1.1
+  video_player_platform_interface:
+    git:
+      url: https://github.com/gumilar1995/plugins-1
+      ref: video_audio_ios_fix_2.4.7
+      path: packages/video_player/video_player_platform_interface
 
 dev_dependencies:
   flutter_test:
