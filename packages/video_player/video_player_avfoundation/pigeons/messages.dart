@@ -31,6 +31,13 @@ class VolumeMessage {
   double volume;
 }
 
+class AudioMessage {
+  AudioMessage(this.textureId, this.audios, this.index);
+  int? textureId;
+  List<dynamic>? audios;
+  int? index;
+}
+
 class PlaybackSpeedMessage {
   PlaybackSpeedMessage(this.textureId, this.speed);
   int textureId;
@@ -73,6 +80,12 @@ abstract class AVFoundationVideoPlayerApi {
   void setPlaybackSpeed(PlaybackSpeedMessage msg);
   @ObjCSelector('play:')
   void play(TextureMessage msg);
+  @ObjCSelector('setAudio:')
+  AudioMessage setAudio(AudioMessage msg);
+  @ObjCSelector('setAudioByIndex:')
+  AudioMessage setAudioByIndex(AudioMessage msg);
+  @ObjCSelector('getAudios:')
+  AudioMessage getAudios(AudioMessage msg);
   @ObjCSelector('position:')
   PositionMessage position(TextureMessage msg);
   @ObjCSelector('seekTo:')

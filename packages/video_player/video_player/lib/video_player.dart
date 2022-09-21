@@ -459,6 +459,18 @@ class VideoPlayerController extends ValueNotifier<VideoPlayerValue> {
     await _applyPlayPause();
   }
 
+  Future<List<dynamic>> getAudios() async {
+    return _videoPlayerPlatform.getAudios(_textureId);
+  }
+
+  Future<void> setAudioByIndex(int index) async {
+    return _videoPlayerPlatform.setAudioByIndex(_textureId, index);
+  }
+
+  Future<void> setAudio(String audio) async {
+    return _videoPlayerPlatform.setAudio(_textureId, [audio]);
+  }
+
   /// Sets whether or not the video should loop after playing once. See also
   /// [VideoPlayerValue.isLooping].
   Future<void> setLooping(bool looping) async {

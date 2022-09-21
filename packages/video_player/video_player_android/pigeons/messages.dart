@@ -30,6 +30,13 @@ class VolumeMessage {
   double volume;
 }
 
+class AudioMessage {
+  AudioMessage(this.textureId, this.audios, this.index);
+  int? textureId;
+  List<dynamic>? audios;
+  int? index;
+}
+
 class PlaybackSpeedMessage {
   PlaybackSpeedMessage(this.textureId, this.speed);
   int textureId;
@@ -66,6 +73,9 @@ abstract class AndroidVideoPlayerApi {
   void setPlaybackSpeed(PlaybackSpeedMessage msg);
   void play(TextureMessage msg);
   PositionMessage position(TextureMessage msg);
+  AudioMessage setAudio(AudioMessage msg);
+  AudioMessage setAudioByIndex(AudioMessage msg);
+  AudioMessage getAudios(AudioMessage msg);
   void seekTo(PositionMessage msg);
   void pause(TextureMessage msg);
   void setMixWithOthers(MixWithOthersMessage msg);

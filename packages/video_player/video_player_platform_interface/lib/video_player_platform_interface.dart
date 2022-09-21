@@ -58,6 +58,21 @@ abstract class VideoPlayerPlatform extends PlatformInterface {
     throw UnimplementedError('videoEventsFor() has not been implemented.');
   }
 
+  /// Get audios from video
+  Future<List<dynamic>> getAudios(int textureId) {
+    throw UnimplementedError('getAudios() has not been implemented');
+  }
+
+  /// Set audio by audio name
+  Future<void> setAudio(int textureId, List audio) {
+    throw UnimplementedError('setAudio() has not been implemented');
+  }
+
+  /// Set audio by index
+  Future<void> setAudioByIndex(int textureId, int index) {
+    throw UnimplementedError('setAudioByIndex() has not been implemented');
+  }
+
   /// Sets the looping attribute of the video.
   Future<void> setLooping(int textureId, bool looping) {
     throw UnimplementedError('setLooping() has not been implemented.');

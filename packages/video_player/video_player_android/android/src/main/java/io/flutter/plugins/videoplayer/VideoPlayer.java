@@ -21,13 +21,22 @@ import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.Player.Listener;
 import com.google.android.exoplayer2.audio.AudioAttributes;
+import com.google.android.exoplayer2.RendererCapabilities;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
 import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
+import com.google.android.exoplayer2.ui.TrackNameProvider;
+import com.google.android.exoplayer2.ui.DefaultTrackNameProvider;
+import com.google.android.exoplayer2.source.TrackGroup;
+import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSource;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
@@ -35,6 +44,7 @@ import com.google.android.exoplayer2.util.Util;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.view.TextureRegistry;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -54,11 +64,15 @@ final class VideoPlayer {
 
   private QueuingEventSink eventSink;
 
+  DefaultTrackSelector trackSelector;
+
   private final EventChannel eventChannel;
 
   @VisibleForTesting boolean isInitialized = false;
 
   private final VideoPlayerOptions options;
+
+  Context context;
 
   VideoPlayer(
       Context context,
@@ -71,8 +85,10 @@ final class VideoPlayer {
     this.eventChannel = eventChannel;
     this.textureEntry = textureEntry;
     this.options = options;
+    this.context = context;
 
-    ExoPlayer exoPlayer = new ExoPlayer.Builder(context).build();
+    DefaultTrackSelector trackSelector = new DefaultTrackSelector(context);
+    ExoPlayer exoPlayer = new SimpleExoPlayer.Builder(context).setTrackSelector(trackSelector).build();
 
     Uri uri = Uri.parse(dataSource);
     DataSource.Factory dataSourceFactory;
@@ -265,6 +281,122 @@ final class VideoPlayer {
   void setVolume(double value) {
     float bracketedValue = (float) Math.max(0.0, Math.min(1.0, value));
     exoPlayer.setVolume(bracketedValue);
+  }
+
+  @SuppressWarnings("unchecked")
+  ArrayList getAudios() {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
+
+    ArrayList audios = new ArrayList();
+
+    if(mappedTrackInfo == null){
+      return audios;
+    }
+
+    for(int i =0;i<mappedTrackInfo.getRendererCount();i++)
+    {
+      if(mappedTrackInfo.getRendererType(i)!= C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for(int j =0;j<trackGroupArray.length;j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+          if ((mappedTrackInfo.getTrackSupport(i, j, k) &0b111)
+                  == RendererCapabilities.FORMAT_HANDLED) {
+            //trackSelector.setParameters(builder);
+            audios.add(provider.getTrackName(group.getFormat(k)));
+
+
+          }
+
+        }
+      }
+
+    }
+    return audios;
+
+
+  }
+
+  void setAudio(String audioName) {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
+
+    StringBuilder str = new StringBuilder();
+
+    for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+      if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for (int j = 0; j < trackGroupArray.length; j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+
+          if (provider.getTrackName(group.getFormat(k)).equals(audioName)) {
+
+            DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+            builder.clearSelectionOverrides(i).setRendererDisabled(i, false);
+            int[] tracks = {k};
+            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(j, tracks);
+            builder.setSelectionOverride(i, mappedTrackInfo.getTrackGroups(i), override);
+            trackSelector.setParameters(builder);
+            return ;
+
+
+
+          }
+
+        }
+      }
+
+    }
+  }
+
+  void setAudioByIndex(int  index) {
+    MappingTrackSelector.MappedTrackInfo mappedTrackInfo =
+            trackSelector.getCurrentMappedTrackInfo();
+
+    StringBuilder str = new StringBuilder();
+    int audioIndex =0;
+
+    for (int i = 0; i < mappedTrackInfo.getRendererCount(); i++) {
+      if (mappedTrackInfo.getRendererType(i) != C.TRACK_TYPE_AUDIO)
+        continue;
+
+      TrackGroupArray trackGroupArray = mappedTrackInfo.getTrackGroups(i);
+      for (int j = 0; j < trackGroupArray.length; j++) {
+
+        TrackGroup group = trackGroupArray.get(j);
+        TrackNameProvider provider = new DefaultTrackNameProvider(context.getResources());
+        for (int k = 0; k < group.length; k++) {
+
+          if (audioIndex == index) {
+
+            DefaultTrackSelector.ParametersBuilder builder = trackSelector.getParameters().buildUpon();
+            builder.clearSelectionOverrides(i).setRendererDisabled(i, false);
+            int[] tracks = {k};
+            DefaultTrackSelector.SelectionOverride override = new DefaultTrackSelector.SelectionOverride(j, tracks);
+            builder.setSelectionOverride(i, mappedTrackInfo.getTrackGroups(i), override);
+            trackSelector.setParameters(builder);
+            return ;
+
+
+
+          }
+          audioIndex++;
+
+
+        }
+      }
+
+    }
   }
 
   void setPlaybackSpeed(double value) {
