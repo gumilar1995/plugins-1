@@ -663,7 +663,7 @@ NS_INLINE UIViewController *rootViewController() API_AVAILABLE(ios(16.0)) {
 - (FLTAudioMessage*)getAudios:(FLTTextureMessage*)input error:(FlutterError**)error{
 
   FLTAudioMessage* result = [[FLTAudioMessage alloc] init];
-  FLTVideoPlayer* player = _players[input.textureId];
+  FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
     AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
 
     NSArray* x = audioSelectionGroup.options;
@@ -684,7 +684,7 @@ NS_INLINE UIViewController *rootViewController() API_AVAILABLE(ios(16.0)) {
 
 }
 - (void)setAudioByIndex:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
-    FLTVideoPlayer* player = _players[input.textureId];
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
     int index = [input.index intValue];
     int i =0;
 
@@ -704,7 +704,7 @@ NS_INLINE UIViewController *rootViewController() API_AVAILABLE(ios(16.0)) {
     }
 }
 - (void)setAudio:(nonnull FLTAudioMessage *)input error:(FlutterError * _Nullable __autoreleasing * _Nonnull)error {
-    FLTVideoPlayer* player = _players[input.textureId];
+    FLTVideoPlayer* player = self.playersByTextureId[input.textureId];
     NSString* audioType = input.audios.firstObject;
     AVMediaSelectionGroup *audioSelectionGroup = [[[player.player currentItem] asset] mediaSelectionGroupForMediaCharacteristic: AVMediaCharacteristicAudible];
     NSArray* x = audioSelectionGroup.options;
