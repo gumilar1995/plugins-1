@@ -112,7 +112,7 @@ class AudioMessage {
     this.textureId,
     this.audios,
     this.index,
-  })
+  });
 
   int? textureId;
   List<dynamic>? audios;
@@ -493,7 +493,6 @@ class AVFoundationVideoPlayerApi {
     }
   }
 
-
   Future<void> setAudio(AudioMessage arg) async {
     final Object encoded = arg.encode();
     const BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(
@@ -569,7 +568,6 @@ class AVFoundationVideoPlayerApi {
       return AudioMessage.decode(replyMap['result']!);
     }
   }
-
 
   Future<void> seekTo(PositionMessage arg_msg) async {
     final BasicMessageChannel<Object?> channel = BasicMessageChannel<Object?>(

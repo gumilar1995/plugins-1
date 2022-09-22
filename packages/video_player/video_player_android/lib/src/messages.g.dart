@@ -37,7 +37,7 @@ class AudioMessage {
     this.textureId,
     this.audios,
     this.index,
-  })
+  });
 
   int? textureId;
   List<dynamic>? audios;
