@@ -923,14 +923,14 @@ public class Messages {
             new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.VideoPlayerApi.setAudio", new StandardMessageCodec());
         if (api != null) {
           channel.setMessageHandler((message, reply) -> {
-            HashMap<String, HashMap> wrapped = new HashMap<>();
+            Map<String, Object> wrapped = new HashMap<>();
             try {
               @SuppressWarnings("ConstantConditions")
               AudioMessage input = AudioMessage.fromMap((HashMap)message);
               api.setAudio(input);
               wrapped.put("result", null);
             }
-            catch (Exception exception) {
+            catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));
             }
             reply.reply(wrapped);
@@ -944,14 +944,14 @@ public class Messages {
             new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.VideoPlayerApi.setAudioByIndex", new StandardMessageCodec());
         if (api != null) {
           channel.setMessageHandler((message, reply) -> {
-            HashMap<String, HashMap> wrapped = new HashMap<>();
+            Map<String, Object> wrapped = new HashMap<>();
             try {
               @SuppressWarnings("ConstantConditions")
               AudioMessage input = AudioMessage.fromMap((HashMap)message);
               api.setAudioByIndex(input);
               wrapped.put("result", null);
             }
-            catch (Exception exception) {
+            catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));
             }
             reply.reply(wrapped);
@@ -965,14 +965,14 @@ public class Messages {
             new BasicMessageChannel<>(binaryMessenger, "dev.flutter.pigeon.VideoPlayerApi.getAudios", new StandardMessageCodec());
         if (api != null) {
           channel.setMessageHandler((message, reply) -> {
-            HashMap<String, HashMap> wrapped = new HashMap<>();
+            Map<String, Object> wrapped = new HashMap<>();
             try {
               @SuppressWarnings("ConstantConditions")
               TextureMessage input = TextureMessage.fromMap((HashMap)message);
               AudioMessage output = api.getAudios(input);
               wrapped.put("result", output.toMap());
             }
-            catch (Exception exception) {
+            catch (Error | RuntimeException exception) {
               wrapped.put("error", wrapError(exception));
             }
             reply.reply(wrapped);
